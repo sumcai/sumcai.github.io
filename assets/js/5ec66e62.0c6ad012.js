@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkvulkan_doc=self.webpackChunkvulkan_doc||[]).push([[465],{8221:e=>{e.exports=JSON.parse('{"categoryGeneratedIndex":{"title":"\ud83d\udcc1 Vulkan\u57fa\u7840\u6982\u5ff5","slug":"/concept","permalink":"/concept","sidebar":"VulkanDoc","navigation":{"next":{"title":"\u4ec0\u4e48\u662fvulkan","permalink":"/concept/what_is_vulkan"}}}}')}}]);
