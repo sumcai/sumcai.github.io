@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkvulkan_doc=self.webpackChunkvulkan_doc||[]).push([[688],{4660:a=>{a.exports=JSON.parse('{"metadata":{"permalink":"/blog/page/16","page":16,"postsPerPage":1,"totalPages":17,"totalCount":17,"previousPage":"/blog/page/15","nextPage":"/blog/page/17","blogDescription":"News and technical articles about Vulkan","blogTitle":"Vulkan Blog"}}')}}]);

@@ -4,10 +4,134 @@
         <title>Vulkan Guide Blog</title>
         <link>https://www.iogl.cn/blog</link>
         <description>Vulkan Guide Blog</description>
-        <lastBuildDate>Mon, 07 Oct 2024 14:52:25 GMT</lastBuildDate>
+        <lastBuildDate>Sat, 01 Mar 2025 17:49:18 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>zh</language>
+        <item>
+            <title><![CDATA[vulkan中的MSAA resolvemode]]></title>
+            <link>https://www.iogl.cn/blog/17.vulkan_msaa_resolvemode</link>
+            <guid>https://www.iogl.cn/blog/17.vulkan_msaa_resolvemode</guid>
+            <pubDate>Sat, 01 Mar 2025 17:49:18 GMT</pubDate>
+            <description><![CDATA[VKRESOLVEMODEAVERAGEBIT 是 Vulkan 多重采样抗锯齿（MSAA） 解析（resolve）操作的一种模式，它的作用是 对多个采样点的颜色值求平均，然后将结果存储到解析目标（resolve attachment）中。]]></description>
+            <content:encoded><![CDATA[<p><code>VK_RESOLVE_MODE_AVERAGE_BIT</code> 是 Vulkan <strong>多重采样抗锯齿（MSAA）</strong> 解析（resolve）操作的一种模式，它的作用是 <strong>对多个采样点的颜色值求平均</strong>，然后将结果存储到解析目标（resolve attachment）中。</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="1-为什么需要-vk_resolve_mode_average_bit"><strong>1. 为什么需要 <code>VK_RESOLVE_MODE_AVERAGE_BIT</code>？</strong><a href="https://www.iogl.cn/blog/17.vulkan_msaa_resolvemode#1-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81-vk_resolve_mode_average_bit" class="hash-link" aria-label="1-为什么需要-vk_resolve_mode_average_bit的直接链接" title="1-为什么需要-vk_resolve_mode_average_bit的直接链接">​</a></h2>
+<p>在 <strong>MSAA</strong> 渲染过程中，每个像素具有多个子采样点（multi-sample points），但最终屏幕只能显示一个颜色值。因此，在 <strong>MSAA 解析阶段</strong>（resolve），需要将 <strong>多采样颜色缓冲转换为单采样缓冲</strong>，这通常会使用 <strong>解析模式（resolve mode）</strong> 来决定如何计算最终颜色。</p>
+<p><code>VK_RESOLVE_MODE_AVERAGE_BIT</code> 具体作用：</p>
+<ul>
+<li><strong>对所有采样点的颜色值求平均</strong>，得到一个平滑过渡的最终颜色。</li>
+<li><strong>适用于颜色缓冲的解析（color resolve）</strong>，减少因抗锯齿带来的边缘锐度损失。</li>
+<li><strong>提高视觉平滑度</strong>，尤其适用于高对比度的边缘。</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="2-代码示例"><strong>2. 代码示例</strong><a href="https://www.iogl.cn/blog/17.vulkan_msaa_resolvemode#2-%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8B" class="hash-link" aria-label="2-代码示例的直接链接" title="2-代码示例的直接链接">​</a></h2>
+<p>在 Vulkan 创建 <strong>多采样颜色缓冲（MSAA color attachment）</strong> 并解析时，可以这样设置：</p>
+<div class="codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">cpp复制编辑VkSubpassDescription subpass = {};</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">subpass.colorAttachmentCount = 1;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">subpass.pColorAttachments = &amp;colorAttachmentRef;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">subpass.pResolveAttachments = &amp;resolveAttachmentRef;</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="复制代码到剪贴板" title="复制" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p><strong>指定 <code>VK_RESOLVE_MODE_AVERAGE_BIT</code> 解析模式：</strong></p>
+<div class="codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">cpp复制编辑VkSubpassDescription2 subpass = {};</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">subpass.pResolveAttachments = &amp;resolveAttachmentRef;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">VkAttachmentDescription2 resolveAttachment = {};</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">resolveAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">resolveAttachment.samples = VK_SAMPLE_COUNT_1_BIT;  // 解析到单采样</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">resolveAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">resolveAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">resolveAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">resolveAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">VkAttachmentReference2 resolveAttachmentRef = {};</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">resolveAttachmentRef.attachment = 1;  // 解析附件索引</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">resolveAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">resolveAttachmentRef.resolveMode = VK_RESOLVE_MODE_AVERAGE_BIT;</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="复制代码到剪贴板" title="复制" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="3-vk_resolve_mode_average_bit-vs-其他解析模式"><strong>3. <code>VK_RESOLVE_MODE_AVERAGE_BIT</code> vs. 其他解析模式</strong><a href="https://www.iogl.cn/blog/17.vulkan_msaa_resolvemode#3-vk_resolve_mode_average_bit-vs-%E5%85%B6%E4%BB%96%E8%A7%A3%E6%9E%90%E6%A8%A1%E5%BC%8F" class="hash-link" aria-label="3-vk_resolve_mode_average_bit-vs-其他解析模式的直接链接" title="3-vk_resolve_mode_average_bit-vs-其他解析模式的直接链接">​</a></h2>
+<p>Vulkan 提供了多种解析模式，每种适用于不同的渲染需求：</p>
+<table><thead><tr><th><strong>解析模式</strong></th><th><strong>作用</strong></th></tr></thead><tbody><tr><td><code>VK_RESOLVE_MODE_NONE</code></td><td>不进行解析</td></tr><tr><td><code>VK_RESOLVE_MODE_SAMPLE_ZERO_BIT</code></td><td>直接选取第一个采样点的值</td></tr><tr><td><code>VK_RESOLVE_MODE_AVERAGE_BIT</code></td><td><strong>计算所有采样点的平均值</strong>（常用于颜色缓冲解析）</td></tr><tr><td><code>VK_RESOLVE_MODE_MIN_BIT</code></td><td>选取最小颜色值（适用于深度缓冲解析）</td></tr><tr><td><code>VK_RESOLVE_MODE_MAX_BIT</code></td><td>选取最大颜色值（适用于深度缓冲解析）</td></tr></tbody></table>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="4-适用场景"><strong>4. 适用场景</strong><a href="https://www.iogl.cn/blog/17.vulkan_msaa_resolvemode#4-%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF" class="hash-link" aria-label="4-适用场景的直接链接" title="4-适用场景的直接链接">​</a></h2>
+<p>✅ <strong>适合颜色缓冲的解析</strong></p>
+<ul>
+<li>适用于 MSAA <strong>颜色附件（color attachment）</strong> 解析，使得边缘更平滑。</li>
+<li>对 <strong>HDR 渲染</strong> 也适用，可防止过度锐化的现象。</li>
+</ul>
+<p>❌ <strong>不适用于深度/模版缓冲</strong></p>
+<ul>
+<li>深度缓冲通常用 <code>VK_RESOLVE_MODE_MIN_BIT</code> 或 <code>VK_RESOLVE_MODE_MAX_BIT</code>，而不是 <code>VK_RESOLVE_MODE_AVERAGE_BIT</code>，因为深度值不能简单平均。</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="5-总结"><strong>5. 总结</strong><a href="https://www.iogl.cn/blog/17.vulkan_msaa_resolvemode#5-%E6%80%BB%E7%BB%93" class="hash-link" aria-label="5-总结的直接链接" title="5-总结的直接链接">​</a></h2>
+<ul>
+<li><code>VK_RESOLVE_MODE_AVERAGE_BIT</code> <strong>用于 MSAA 解析（resolve）时计算采样点的平均颜色值</strong>。</li>
+<li><strong>适用于颜色缓冲（color attachments），可减少锯齿，提高画面平滑度</strong>。</li>
+<li><strong>不适用于深度/模板缓冲（depth/stencil attachments）</strong>，因为深度解析通常需要最小值或最大值，而非平均值。</li>
+</ul>
+<p>🚀 <strong>如果你的 Vulkan 应用使用 MSAA，并希望平滑过渡颜色缓冲，<code>VK_RESOLVE_MODE_AVERAGE_BIT</code> 是推荐的解析模式！</strong></p>]]></content:encoded>
+            <author>sumcai@163.com (苏明才)</author>
+            <category>图形基础</category>
+        </item>
+        <item>
+            <title><![CDATA[什么是MSAA]]></title>
+            <link>https://www.iogl.cn/blog/16.msaa</link>
+            <guid>https://www.iogl.cn/blog/16.msaa</guid>
+            <pubDate>Fri, 28 Feb 2025 15:47:18 GMT</pubDate>
+            <description><![CDATA[MSAA（Multisample Anti-Aliasing，多重采样抗锯齿） 是一种 硬件级别的抗锯齿技术，用于减少 3D 渲染中的 锯齿效应（aliasing），特别是在 边缘平滑处理 方面效果显著。]]></description>
+            <content:encoded><![CDATA[<p><strong>MSAA（Multisample Anti-Aliasing，多重采样抗锯齿）</strong> 是一种 <strong>硬件级别的抗锯齿技术</strong>，用于减少 3D 渲染中的 <strong>锯齿效应（aliasing）</strong>，特别是在 <strong>边缘平滑处理</strong> 方面效果显著。</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="1-为什么需要-msaa抗锯齿的必要性"><strong>1. 为什么需要 MSAA？（抗锯齿的必要性）</strong><a href="https://www.iogl.cn/blog/16.msaa#1-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81-msaa%E6%8A%97%E9%94%AF%E9%BD%BF%E7%9A%84%E5%BF%85%E8%A6%81%E6%80%A7" class="hash-link" aria-label="1-为什么需要-msaa抗锯齿的必要性的直接链接" title="1-为什么需要-msaa抗锯齿的必要性的直接链接">​</a></h2>
+<p>在计算机图形学中，<strong>像素是离散的</strong>，而 3D 场景中的物体边缘通常是连续的。当我们将连续的几何边缘映射到有限的像素网格时，会出现<strong>锯齿效应</strong>（aliasing），如下所示：</p>
+<p>🔳 <strong>没有抗锯齿的图像：</strong></p>
+<ul>
+<li>物体边缘呈现 <strong>台阶状的锯齿</strong>，影响视觉质量。</li>
+<li>这是因为 <strong>每个像素只能存储一个颜色值</strong>，当边缘落在两个像素之间时，颜色会出现不连续的跳变。</li>
+</ul>
+<p><strong>✅ 抗锯齿后：</strong></p>
+<ul>
+<li>通过<strong>颜色混合</strong>技术，边缘过渡更加平滑。</li>
+<li>MSAA 通过 <strong>在每个像素中增加多个采样点</strong>，并计算加权平均值，从而减少锯齿。</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="2-msaa-的基本原理"><strong>2. MSAA 的基本原理</strong><a href="https://www.iogl.cn/blog/16.msaa#2-msaa-%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86" class="hash-link" aria-label="2-msaa-的基本原理的直接链接" title="2-msaa-的基本原理的直接链接">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="普通渲染-vs-msaa"><strong>普通渲染 vs MSAA</strong><a href="https://www.iogl.cn/blog/16.msaa#%E6%99%AE%E9%80%9A%E6%B8%B2%E6%9F%93-vs-msaa" class="hash-link" aria-label="普通渲染-vs-msaa的直接链接" title="普通渲染-vs-msaa的直接链接">​</a></h3>
+<table><thead><tr><th><strong>方法</strong></th><th><strong>像素采样方式</strong></th><th><strong>效果</strong></th></tr></thead><tbody><tr><td><strong>普通渲染</strong></td><td>1 个像素 → 1 个颜色样本</td><td>🚫 锯齿明显</td></tr><tr><td><strong>MSAA (4x)</strong></td><td>1 个像素 → 4 个采样点，每个采样点有深度信息，但颜色只计算一次</td><td>✅ 平滑</td></tr></tbody></table>
+<p>🔹 <strong>MSAA 的核心思想：</strong></p>
+<ol>
+<li><strong>每个像素的多个子采样点（Subsample Points）独立存储深度信息</strong>。</li>
+<li><strong>当片段着色器（Fragment Shader）运行时，它只计算一次颜色</strong>，但最终的颜色会根据哪些子采样点被覆盖进行混合。</li>
+<li><strong>最终像素颜色是所有子采样点的加权平均值</strong>，从而实现平滑过渡。</li>
+</ol>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="3-msaa-的不同级别"><strong>3. MSAA 的不同级别</strong><a href="https://www.iogl.cn/blog/16.msaa#3-msaa-%E7%9A%84%E4%B8%8D%E5%90%8C%E7%BA%A7%E5%88%AB" class="hash-link" aria-label="3-msaa-的不同级别的直接链接" title="3-msaa-的不同级别的直接链接">​</a></h2>
+<p>MSAA 的性能开销与采样点数量成正比，常见的 MSAA 级别有：</p>
+<table><thead><tr><th><strong>MSAA 级别</strong></th><th><strong>每像素采样点数</strong></th><th><strong>性能开销</strong></th><th><strong>效果</strong></th></tr></thead><tbody><tr><td><strong>1x</strong> （无 MSAA）</td><td>1</td><td>低</td><td>🚫 锯齿明显</td></tr><tr><td><strong>2x MSAA</strong></td><td>2</td><td>适中</td><td>🔹 有一定平滑效果</td></tr><tr><td><strong>4x MSAA</strong></td><td>4</td><td>中等</td><td>✅ 常见，效果明显</td></tr><tr><td><strong>8x MSAA</strong></td><td>8</td><td>高</td><td>🔥 画质好但性能开销大</td></tr><tr><td><strong>16x MSAA</strong></td><td>16</td><td>很高</td><td>🎨 非常平滑，但计算量大</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="示例不同-msaa-级别对比"><strong>示例：不同 MSAA 级别对比</strong><a href="https://www.iogl.cn/blog/16.msaa#%E7%A4%BA%E4%BE%8B%E4%B8%8D%E5%90%8C-msaa-%E7%BA%A7%E5%88%AB%E5%AF%B9%E6%AF%94" class="hash-link" aria-label="示例不同-msaa-级别对比的直接链接" title="示例不同-msaa-级别对比的直接链接">​</a></h3>
+<div class="codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">scss复制编辑[1x MSAA]  ████■■■■████     (严重锯齿)</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">[2x MSAA]  ████▒▒▒▒████     (稍微平滑)</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">[4x MSAA]  ████░░░░████     (明显平滑)</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">[8x MSAA]  ████░░░░████     (非常平滑)</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="复制代码到剪贴板" title="复制" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<ul>
+<li><strong>高 MSAA</strong> 提供更好的边缘平滑效果，但也增加了 GPU 计算负担。</li>
+<li><strong>一般游戏或应用常用 4x MSAA 作为折中方案</strong>。</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="4-vulkan-中的-msaa"><strong>4. Vulkan 中的 MSAA</strong><a href="https://www.iogl.cn/blog/16.msaa#4-vulkan-%E4%B8%AD%E7%9A%84-msaa" class="hash-link" aria-label="4-vulkan-中的-msaa的直接链接" title="4-vulkan-中的-msaa的直接链接">​</a></h2>
+<p>在 Vulkan 里，<strong>MSAA 通过 <code>VkSampleCountFlagBits</code> 设置采样数量</strong>：</p>
+<div class="codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">cpp</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">复制编辑</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_4_BIT; // 4x MSAA</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="复制代码到剪贴板" title="复制" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="在-vulkan-创建-msaa-颜色缓冲"><strong>在 Vulkan 创建 MSAA 颜色缓冲</strong><a href="https://www.iogl.cn/blog/16.msaa#%E5%9C%A8-vulkan-%E5%88%9B%E5%BB%BA-msaa-%E9%A2%9C%E8%89%B2%E7%BC%93%E5%86%B2" class="hash-link" aria-label="在-vulkan-创建-msaa-颜色缓冲的直接链接" title="在-vulkan-创建-msaa-颜色缓冲的直接链接">​</a></h3>
+<ul>
+<li><strong>颜色附件（Color Attachment）</strong> 需要使用多采样：</li>
+</ul>
+<div class="codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">cpp复制编辑VkAttachmentDescription colorAttachment = {};</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">colorAttachment.samples = VK_SAMPLE_COUNT_4_BIT; // 使用 4x MSAA</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="复制代码到剪贴板" title="复制" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<ul>
+<li><strong>解析附件（Resolve Attachment）</strong> 负责从 <strong>多采样转换为单采样</strong>：</li>
+</ul>
+<div class="codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">cpp复制编辑VkAttachmentDescription resolveAttachment = {};</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">resolveAttachment.samples = VK_SAMPLE_COUNT_1_BIT; // 解析到单采样</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="复制代码到剪贴板" title="复制" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<ul>
+<li><strong>在渲染通道（Render Pass）中指定解析目标</strong>：</li>
+</ul>
+<div class="codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">cpp</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">复制编辑</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">subpass.pResolveAttachments = &amp;resolveAttachmentRef;</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="复制��代码到剪贴板" title="复制" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>💡 <strong>MSAA 颜色缓冲不会直接渲染到屏幕上，需要解析到单采样缓冲！</strong></p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="5-msaa-的优缺点"><strong>5. MSAA 的优缺点</strong><a href="https://www.iogl.cn/blog/16.msaa#5-msaa-%E7%9A%84%E4%BC%98%E7%BC%BA%E7%82%B9" class="hash-link" aria-label="5-msaa-的优缺点的直接链接" title="5-msaa-的优缺点的直接链接">​</a></h2>
+<table><thead><tr><th><strong>优点</strong></th><th><strong>缺点</strong></th></tr></thead><tbody><tr><td>✅ 提高边缘平滑度，减少锯齿</td><td>❌ 性能消耗较高</td></tr><tr><td>✅ 硬件级优化，支持广泛</td><td>❌ 不能减少纹理采样导致的锯齿</td></tr><tr><td>✅ 兼容大多数 GPU 和 API</td><td>❌ 仅对几何边缘生效，对透明纹理无效</td></tr></tbody></table>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="6-msaa-vs-其他抗锯齿技术"><strong>6. MSAA vs 其他抗锯齿技术</strong><a href="https://www.iogl.cn/blog/16.msaa#6-msaa-vs-%E5%85%B6%E4%BB%96%E6%8A%97%E9%94%AF%E9%BD%BF%E6%8A%80%E6%9C%AF" class="hash-link" aria-label="6-msaa-vs-其他抗锯齿技术的直接链接" title="6-msaa-vs-其他抗锯齿技术的直接链接">​</a></h2>
+<table><thead><tr><th><strong>抗锯齿技术</strong></th><th><strong>方式</strong></th><th><strong>优缺点</strong></th></tr></thead><tbody><tr><td><strong>MSAA（多重采样）</strong></td><td>仅对几何边缘采样，平均颜色</td><td>✅ 画质好，硬件支持；❌ 对透明纹理无效</td></tr><tr><td><strong>SSAA（超采样，SuperSampling）</strong></td><td>整个场景放大渲染再缩小</td><td>✅ 画质最好；❌ 计算量巨大</td></tr><tr><td><strong>FXAA（快速近似抗锯齿）</strong></td><td>纹理后处理</td><td>✅ 计算快，适合低端 GPU；❌ 模糊</td></tr><tr><td><strong>TAA（时间抗锯齿）</strong></td><td>结合前一帧信息进行平滑</td><td>✅ 对动态画面更有效；❌ 可能导致拖影</td></tr></tbody></table>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="7-总结"><strong>7. 总结</strong><a href="https://www.iogl.cn/blog/16.msaa#7-%E6%80%BB%E7%BB%93" class="hash-link" aria-label="7-总结的直接链接" title="7-总结的直接链接">​</a></h2>
+<ul>
+<li><strong>MSAA 是一种 GPU 硬件支持的抗锯齿技术，专注于几何边缘的平滑处理。</strong></li>
+<li><strong>它通过在像素内使用多个子采样点来减少锯齿效应，并且对性能的影响比 SSAA 小，但仍然比 FXAA 和 TAA 要高。</strong></li>
+<li><strong>Vulkan 允许通过 <code>VkSampleCountFlagBits</code> 轻松启用 MSAA，并通过 <code>resolve attachment</code> 解析到最终帧缓冲。</strong></li>
+<li><strong>在游戏或图形应用中，4x MSAA 通常是一个性能和画质的折中方案。</strong></li>
+</ul>
+<p>🚀 <strong>在 Vulkan 开发中，如果你需要抗锯齿但又想兼顾性能，4x MSAA 是一个不错的选择！</strong></p>]]></content:encoded>
+            <author>sumcai@163.com (苏明才)</author>
+            <category>图形基础</category>
+        </item>
         <item>
             <title><![CDATA[MipMap与LOD是何物？]]></title>
             <link>https://www.iogl.cn/blog/11.MipMap与LOD是何物</link>
